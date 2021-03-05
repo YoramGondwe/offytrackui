@@ -1,12 +1,17 @@
+import "react-perfect-scrollbar/dist/css/styles.css";
+import { ThemeProvider } from "@material-ui/core";
+import React, { FunctionComponent } from "react";
+import GlobalStyles from "./components/GlobalStyles";
+import theme from "./theme";
+import { Routes } from "./Routes";
 
-import "./App.css";
-
-function App() {
+const App: FunctionComponent = () => {
   return (
-    <div className="App">
-      hello to Yoram Baisc
-    </div>
+    <ThemeProvider theme={theme}>
+      <GlobalStyles />
+      <Routes />
+    </ThemeProvider>
   );
-}
+};
 
 export default App;
