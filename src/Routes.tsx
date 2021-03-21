@@ -7,8 +7,8 @@ import { Dashboard } from "./views/Dashboard";
 export const Routes: FunctionComponent = () => {
   return (
     <Switch>
-      <Route path="/login" exact component={LoginView} />
-      <UserRoute path="/" exact component={Dashboard} />
+      <UserRoute path="/login" exact component={Dashboard} />
+      <Route path="/" exact component={LoginView} />
     </Switch>
   );
 };
