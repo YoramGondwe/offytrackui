@@ -1,7 +1,7 @@
 import React, { FunctionComponent, ReactNode, useContext } from "react";
-import { Redirect, Route } from "react-router-dom";
+import { Route } from "react-router-dom";
 import { AuthContext } from "../context";
-// import { FullRedirect } from "./FullRedirect";
+import { FullRedirect } from "./FullRedirect";
 import { RouteProps } from "./routeProps";
 
 export const UserRoute: FunctionComponent<RouteProps> = ({
@@ -18,12 +18,11 @@ export const UserRoute: FunctionComponent<RouteProps> = ({
           return Component ? <Component {...props} /> : render();
         } else {
           return (
-            <Redirect to="/auth/login" />
-            // <FullRedirect
-            //   to={{
-            //     pathname: "/auth/login",
-            //   }}
-            // />
+            <FullRedirect
+              to={{
+                pathname: "/login",
+              }}
+            />
           );
         }
       }}
