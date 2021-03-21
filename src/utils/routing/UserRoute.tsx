@@ -15,7 +15,6 @@ export const UserRoute: FunctionComponent<RouteProps> = ({
       {...config}
       render={(props): ReactNode => {
         if (user?.confirmed) {
-          console.log("hello");
           return Component ? <Component {...props} /> : render();
         } else {
           return (
