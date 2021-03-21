@@ -21,11 +21,10 @@ const App: FunctionComponent = () => {
   const initializeSession = async (): Promise<void> => {
     // determine login state
     try {
-      const newSession: any = await coreService.get("/users/me");
-
+      const { data }: any = await coreService.get("/users/me");
       setSession({
         ...session,
-        ...newSession,
+        user: data,
       });
     } catch (error) {
       console.debug("Not logged in", error);

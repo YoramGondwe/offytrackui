@@ -1,5 +1,5 @@
-import React, { FunctionComponent, useEffect } from "react";
-import { Link as RouterLink, useLocation } from "react-router-dom";
+import React, { FunctionComponent, useContext, useEffect } from "react";
+import { Link as RouterLink, useHistory, useLocation } from "react-router-dom";
 import {
   Avatar,
   Box,
@@ -15,14 +15,14 @@ import {
   BarChart as BarChartIcon,
   // ShoppingBag as ShoppingBagIcon,
   ShoppingCart as ShopIcon,
-  User as UserIcon,
-  Globe as GlobeIcon,
-  Layers as LayersIcon,
   Package as PackageIcon,
   Truck as TruckIcon,
 } from "react-feather";
 // import { useAuthState, useAuthDispatch, logout } from 'src/Provider';
 import NavItem from "./NavItem";
+import { AuthContext } from "../../../utils/context";
+import { coreService } from "../../../utils/api/axios";
+import { useQuery } from "react-query";
 
 const items = [
   {
@@ -31,34 +31,19 @@ const items = [
     title: "Dashboard",
   },
   {
-    href: "/app/inventory",
+    href: "/request",
     icon: PackageIcon,
-    title: "Inventory",
+    title: "Request Leave",
   },
   {
-    href: "/app/orders",
+    href: "/leaveTypes",
     icon: TruckIcon,
-    title: "Orders",
+    title: "Leave Types",
   },
   {
-    href: "/app/shops",
+    href: "/settings",
     icon: ShopIcon,
-    title: "Shops",
-  },
-  {
-    href: "/app/agents",
-    icon: UserIcon,
-    title: "Agents",
-  },
-  {
-    href: "/app/regions",
-    icon: GlobeIcon,
-    title: "Regions",
-  },
-  {
-    href: "/app/shoptypes",
-    icon: LayersIcon,
-    title: "Shop Types",
+    title: "Settings",
   },
 ];
 
@@ -89,23 +74,32 @@ const NavBar: FunctionComponent<NavbarProps> = ({
 }) => {
   const classes = useStyles();
   const location = useLocation();
-  //   const history = useHistory();
-  //   const dispatch = useAuthDispatch();
-  //   const { user } = useAuthState();
-  const user = {
-    business_name: "the names",
-    email: "yoramemail",
+  const history = useHistory();
+  const { setSession, user } = useContext(AuthContext);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const fetchOrganization = async (): Promise<any> => {
+    const { data } = await coreService.get(
+      `/organizations/${user?.organization}`
+    );
+    return data;
   };
-
-  //   const handleLogout = () => {
-  //     logout(dispatch);
-  //     history.push('/app/login');
-  //   };
+  const { data, isLoading } = useQuery(
+    `organization${user?.organization}`,
+    fetchOrganization
+  );
+  const handleLogout = () => {
+    setSession({});
+    localStorage.removeItem("token");
+    history.push("/login");
+  };
   useEffect(() => {
     if (openMobile && onMobileClose) {
       onMobileClose();
     }
   }, [location.pathname]);
+  if (isLoading && !data) {
+    return <p>Loading...</p>;
+  }
 
   const content = (
     <Box height="100%" display="flex" flexDirection="column">
@@ -119,10 +113,10 @@ const NavBar: FunctionComponent<NavbarProps> = ({
           to="/"
         />
         <Typography color="textPrimary" variant="h5">
-          {user.business_name}
+          {data.name}
         </Typography>
         <Typography color="textSecondary" variant="body2">
-          {user.email}
+          {data.email}
         </Typography>
       </Box>
       <Divider />
@@ -152,7 +146,7 @@ const NavBar: FunctionComponent<NavbarProps> = ({
             component="a"
             fullWidth
             variant="outlined"
-            onClick={() => console.debug()}
+            onClick={() => handleLogout()}
           >
             Sign Out
           </Button>
@@ -187,15 +181,5 @@ const NavBar: FunctionComponent<NavbarProps> = ({
     </>
   );
 };
-
-// NavBar.propTypes = {
-//   onMobileClose: PropTypes.func,
-//   openMobile: PropTypes.bool,
-// };
-
-// NavBar.defaultProps = {
-//   onMobileClose: () => {},
-//   openMobile: false,
-// };
 
 export default NavBar;

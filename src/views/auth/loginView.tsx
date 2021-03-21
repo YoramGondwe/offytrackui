@@ -1,5 +1,5 @@
-import React, { FunctionComponent } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import React, { FunctionComponent, useContext } from "react";
+import { Link as RouterLink, useHistory } from "react-router-dom";
 import * as Yup from "yup";
 import { Form, Formik } from "formik";
 import {
@@ -13,6 +13,8 @@ import {
 } from "@material-ui/core";
 import Page from "../../components/Page";
 import MainLayout from "../../layouts/MainLayout";
+import axios from "axios";
+import { AuthContext } from "../../utils/context";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -25,7 +27,8 @@ const useStyles = makeStyles((theme) => ({
 
 export const LoginView: FunctionComponent = () => {
   const classes = useStyles();
-  //   const history = useHistory();
+  const { setSession } = useContext(AuthContext);
+  const history = useHistory();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [error, setError] = React.useState(false);
 
@@ -41,11 +44,11 @@ export const LoginView: FunctionComponent = () => {
           <Container maxWidth="sm">
             <Formik
               initialValues={{
-                email: "",
+                identifier: "yoram3@domain.com",
                 password: "",
               }}
               validationSchema={Yup.object().shape({
-                email: Yup.string()
+                identifier: Yup.string()
                   .email("Must be a valid email")
                   .max(255)
                   .required("Email is required"),
@@ -54,7 +57,16 @@ export const LoginView: FunctionComponent = () => {
                   .required("Password is required"),
               })}
               onSubmit={async (values) => {
-                console.log(values);
+                const { data, status } = await axios.post(
+                  "/auth/local",
+                  values
+                );
+                if (status === 200) {
+                  setSession({ user: data });
+                  localStorage.setItem("token", data.jwt);
+                  history.push("/");
+                  window.location.reload();
+                }
               }}
             >
               {({
@@ -88,16 +100,16 @@ export const LoginView: FunctionComponent = () => {
                     </Box>
                   )}
                   <TextField
-                    error={Boolean(touched.email && errors.email)}
+                    error={Boolean(touched.identifier && errors.identifier)}
                     fullWidth
-                    helperText={touched.email && errors.email}
+                    helperText={touched.identifier && errors.identifier}
                     label="Email Address"
                     margin="normal"
-                    name="email"
+                    name="identifier"
                     onBlur={handleBlur}
                     onChange={handleChange}
                     type="email"
-                    value={values.email}
+                    value={values.identifier}
                     variant="outlined"
                   />
                   <TextField

@@ -1,5 +1,5 @@
-import React, { useState, FunctionComponent } from "react";
-import { Link as RouterLink } from "react-router-dom";
+import React, { useState, FunctionComponent, useContext } from "react";
+import { Link as RouterLink, useHistory } from "react-router-dom";
 import clsx from "clsx";
 import {
   AppBar,
@@ -12,9 +12,9 @@ import {
 } from "@material-ui/core";
 import MenuIcon from "@material-ui/icons/Menu";
 import NotificationsIcon from "@material-ui/icons/NotificationsOutlined";
-// import InputIcon from '@material-ui/icons/Input';
+import InputIcon from "@material-ui/icons/Input";
+import { AuthContext } from "../../utils/context";
 // import Logo from "src/components/Logo";
-// import { useAuthDispatch, logout } from '../../Provider';
 
 const useStyles = makeStyles(() => ({
   root: {},
@@ -36,16 +36,17 @@ const TopBar: FunctionComponent<TopBarProps> = ({
 }) => {
   const classes = useStyles();
   const [notifications] = useState([]);
-  // const dispatch = useAuthDispatch();
-  // const history = useHistory();
-  // const handleLogout = () => {
-  //   logout(dispatch);
-  //   history.push('/app/login');
-  // };
+  const { setSession } = useContext(AuthContext);
+  const history = useHistory();
+  const handleLogout = () => {
+    setSession({});
+    localStorage.removeItem("token");
+    history.push("/login");
+  };
   return (
     <AppBar className={clsx(classes.root, className)} elevation={0} {...rest}>
       <Toolbar>
-        <RouterLink to="/app/dashboard">
+        <RouterLink to="/">
           {/* <Logo /> */}
           Logo here
         </RouterLink>
@@ -60,9 +61,9 @@ const TopBar: FunctionComponent<TopBarProps> = ({
               <NotificationsIcon />
             </Badge>
           </IconButton>
-          {/* <IconButton color="inherit" onClick={handleLogout}>
+          <IconButton color="inherit" onClick={handleLogout}>
             <InputIcon />
-          </IconButton> */}
+          </IconButton>
         </Hidden>
         <Hidden lgUp>
           <IconButton color="inherit" onClick={onMobileNavOpen}>
