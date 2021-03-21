@@ -21,7 +21,7 @@ export const UserRoute: FunctionComponent<RouteProps> = ({
           return (
             <FullRedirect
               to={{
-                pathname: "/login",
+                pathname: "/auth/login",
               }}
             />
           );
